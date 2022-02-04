@@ -1,0 +1,43 @@
+public with sharing class AccountTasksInsertUpdateHandler {
+
+    private static final String TASK_SUBJECT_PREFIX = 'Negotiations with ';
+    private static final String TASK_STATUS = 'Open';
+    private static final Integer NUMBER_OF_TASKS = 3;
+    
+    @InvocableMethod(label = 'InsertOrUpdateTasksForAccounts'
+                     description = 'Insert Or Update Tasks For Accounts'
+                     category = 'Account')
+    public static void insertOrUpdateTasksForAccounts(List<String> ids) {
+        String accountId = ids.get(0);
+        List<AccountHistory> historyAccounts = [SELECT Id FROM AccountHistory WHERE AccountId=:accountId];
+        if (historyAccounts.size() == 0) { 
+			// new account
+	        List<Account> accounts = [SELECT Name FROM Account WHERE Id = :accountId];
+            Task task = new Task();
+            task.Subject = TASK_SUBJECT_PREFIX + accounts.get(0).Name;
+            task.Status = TASK_STATUS;
+            task.WhatId = accountId;        
+            insert task;
+            return;
+        }
+        
+        List<Task> tasks = [SELECT Id FROM Task WHERE AccountId = :accountId];
+        if (tasks.size() >= NUMBER_OF_TASKS) {
+            List<User> users = [SELECT Id FROM User
+                                WHERE isActive != null 
+                                AND Id <> :UserInfo.getUserId()
+                                LIMIT 10];
+            // just in case if no other active users apart of the current one are present
+            if (users.size() == 0) 
+                return;
+            
+            // now pick the random user
+            User randomUser = users.get(Integer.valueof((Math.random() * users.size())));
+
+            for (Task task : tasks) {
+                task.OwnerId = randomUser.Id;
+            }
+            update tasks;
+        }    
+    }    
+}
