@@ -12,7 +12,7 @@ public with sharing class AccountTasksInsertUpdateHandler {
         List<AccountHistory> historyAccounts = [SELECT Id FROM AccountHistory WHERE AccountId=:accountId];
         if (historyAccounts.size() == 0) { 
 			// new account
-	        List<Account> accounts = [SELECT Name FROM Account WHERE Id = :accountId];
+	    List<Account> accounts = [SELECT Name FROM Account WHERE Id = :accountId];
             Task task = new Task();
             task.Subject = TASK_SUBJECT_PREFIX + accounts.get(0).Name;
             task.Status = TASK_STATUS;
