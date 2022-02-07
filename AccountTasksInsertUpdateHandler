@@ -28,8 +28,9 @@ public with sharing class AccountTasksInsertUpdateHandler {
                                 AND Id <> :UserInfo.getUserId()
                                 LIMIT 10];
             // just in case if no other active users apart of the current one are present
-            if (users.size() == 0) 
+            if (users.size() == 0) {
                 return;
+	    }		
             
             // now pick the random user
             User randomUser = users.get(Integer.valueof((Math.random() * users.size())));
