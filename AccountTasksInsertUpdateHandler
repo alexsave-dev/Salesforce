@@ -24,8 +24,8 @@ public with sharing class AccountTasksInsertUpdateHandler {
         List<Task> tasks = [SELECT Id FROM Task WHERE AccountId = :accountId];
         if (tasks.size() >= NUMBER_OF_TASKS) {
             List<User> users = [SELECT Id FROM User
-                                WHERE isActive != null 
-                                AND Id <> :UserInfo.getUserId()
+                                WHERE isActive = true 
+                                AND Id != :UserInfo.getUserId()
                                 LIMIT 10];
             // just in case if no other active users apart of the current one are present
             if (users.size() == 0) {
